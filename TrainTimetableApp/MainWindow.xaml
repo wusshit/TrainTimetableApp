@@ -1,0 +1,114 @@
+﻿<Window x:Class="TrainTimetableApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrainTimetableApp"
+        mc:Ignorable="d"
+        Title="Train Timetable" Height="600" Width="850">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <!-- Define the converter resource -->
+    <Window.Resources>
+        <!-- *** If XDG0008 error persists, double-check the converter file/namespace/build *** -->
+        <local:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Title -->
+            <RowDefinition Height="*"/>
+            <!-- Timetable DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- Separator -->
+            <RowDefinition Height="Auto"/>
+            <!-- Add/Edit Entry Form Title -->
+            <RowDefinition Height="Auto"/>
+            <!-- Add/Edit Entry Form -->
+            <RowDefinition Height="Auto"/>
+            <!-- Action Buttons -->
+        </Grid.RowDefinitions>
+
+        <!-- Main Title -->
+        <TextBlock Grid.Row="0" Text="Train Departures and Arrivals" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+        <!-- Timetable Display -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding TrainSchedules}" SelectedItem="{Binding SelectedScheduleEntry, Mode=TwoWay}"
+                  AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" SelectionMode="Single"
+                  Margin="0,0,0,10" AlternatingRowBackground="Gainsboro" CanUserSortColumns="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Train No." Binding="{Binding TrainNumber}" Width="1*" MinWidth="80"/>
+                <DataGridTextColumn Header="Origin" Binding="{Binding Origin}" Width="1.5*" MinWidth="100"/>
+                <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="1.5*" MinWidth="100"/>
+                <DataGridTextColumn Header="Departure" Binding="{Binding DepartureTime, StringFormat={}{0:dd/MM/yy HH:mm}}" Width="1.2*" MinWidth="120"/>
+                <DataGridTextColumn Header="Arrival" Binding="{Binding ArrivalTime, StringFormat={}{0:dd/MM/yy HH:mm}}" Width="1.2*" MinWidth="120"/>
+                <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" Width="0.8*" MinWidth="60"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="1*" MinWidth="80"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Separator -->
+        <Separator Grid.Row="2" Margin="0,5"/>
+
+        <!-- Add/Edit Form Title (CORRECTED APPROACH using two TextBlocks) -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,5" >
+            <!-- TextBlock for "Add New" - Visible when NOT IsEditing -->
+            <TextBlock Text="Add New Schedule Entry" FontSize="16" FontWeight="SemiBold"
+                        Visibility="{Binding IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}"/>
+            <!-- TextBlock for "Edit" - Visible when IsEditing -->
+            <TextBlock Text="Edit Schedule Entry" FontSize="16" FontWeight="SemiBold"
+                        Visibility="{Binding IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        </StackPanel>
+
+
+        <!-- Add/Edit Entry Form Grid -->
+        <Grid Grid.Row="4" Margin="0,5,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Row 0: Train No, Origin, Destination -->
+            <Label Grid.Row="0" Grid.Column="0" Content="_Train No.:" Target="{Binding ElementName=txtTrainNumber}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtTrainNumber" Grid.Row="0" Grid.Column="1" Text="{Binding NewTrainNumber, UpdateSourceTrigger=PropertyChanged}" Margin="5" VerticalAlignment="Center"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="_Origin:" Target="{Binding ElementName=txtOrigin}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtOrigin" Grid.Row="0" Grid.Column="3" Text="{Binding NewOrigin, UpdateSourceTrigger=PropertyChanged}" Margin="5" VerticalAlignment="Center"/>
+            <Label Grid.Row="0" Grid.Column="4" Content="_Destination:" Target="{Binding ElementName=txtDestination}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtDestination" Grid.Row="0" Grid.Column="5" Text="{Binding NewDestination, UpdateSourceTrigger=PropertyChanged}" Margin="5" VerticalAlignment="Center"/>
+
+            <!-- Row 1: Departure, Arrival -->
+            <Label Grid.Row="1" Grid.Column="0" Content="D_eparture:" Target="{Binding ElementName=txtDeparture}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtDeparture" Grid.Row="1" Grid.Column="1" Text="{Binding NewDepartureTime, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Margin="5" VerticalAlignment="Center" ToolTip="Format: YYYY-MM-DD HH:MM"/>
+            <Label Grid.Row="1" Grid.Column="2" Content="_Arrival:" Target="{Binding ElementName=txtArrival}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtArrival" Grid.Row="1" Grid.Column="3" Text="{Binding NewArrivalTime, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Margin="5" VerticalAlignment="Center" ToolTip="Format: YYYY-MM-DD HH:MM"/>
+
+            <!-- Row 2: Platform, Status -->
+            <Label Grid.Row="2" Grid.Column="0" Content="_Platform:" Target="{Binding ElementName=txtPlatform}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtPlatform" Grid.Row="2" Grid.Column="1" Text="{Binding NewPlatform, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" Margin="5" VerticalAlignment="Center"/>
+            <!-- TargetNullValue added -->
+            <Label Grid.Row="2" Grid.Column="2" Content="_Status:" Target="{Binding ElementName=txtStatus}" VerticalAlignment="Center"/>
+            <TextBox x:Name="txtStatus" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" Text="{Binding NewStatus, UpdateSourceTrigger=PropertyChanged}" Margin="5" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{Binding AddButtonContent}" Command="{Binding AddOrUpdateCommand}" Width="110" Margin="5" Padding="10,5" FontWeight="Medium"/>
+            <Button Content="Cancel Edit" Command="{Binding CancelEditCommand}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}" Width="110" Margin="5" Padding="10,5"/>
+            <Button Content="Delete Selected" Command="{Binding DeleteCommand}" Width="110" Margin="5" Padding="10,5"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
