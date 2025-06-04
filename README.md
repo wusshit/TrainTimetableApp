@@ -1,2 +1,2 @@
-# A train timetable app
-## A WPF application to acomplish basic CRUD operations
+# A train timetable app---Homework from the school
+## A WPF application used to acomplish basic CRUD operations
